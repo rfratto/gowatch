@@ -1,0 +1,24 @@
+actions:
+  vet: |
+    echo Vetting...
+    go vet ./...
+  install: |
+    echo Installing...
+    go install ./cmd/...
+services:
+  tick: |
+    echo tick
+    sleep 1
+    echo tock
+    sleep 1
+on_start:
+  - tick
+file_triggers:
+  - include: ["*.go", "**/*.go", "Gopkg.lock", "Gopkg.toml"]
+    exclude: ["vendor/"]
+    trigger:
+      - vet
+      - tick:stop
+      - install
+      - tick
+
