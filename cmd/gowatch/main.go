@@ -102,7 +102,8 @@ func init() {
 	rootCmd.MarkFlagRequired("config")
 }
 
-// Run runs the gowatch root command.
-func Run() error {
-	return rootCmd.Execute()
+func main() {
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
 }

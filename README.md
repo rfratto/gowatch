@@ -1,5 +1,6 @@
 # gowatch
 
+[![Build Status](https://travis-ci.org/rfratto/gowatch.svg?branch=master)](https://travis-ci.org/rfratto/gowatch)
 [![Go Report Card](https://goreportcard.com/badge/github.com/rfratto/gowatch)](https://goreportcard.com/report/github.com/rfratto/gowatch)
 [![GoDoc](https://godoc.org/github.com/rfratto/gowatch?status.svg)](https://godoc.org/github.com/rfratto/gowatch)
 
