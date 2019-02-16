@@ -4,15 +4,15 @@
 // The core of gowatch is gowatch.Config, which holds the following:
 //
 // 1. A list of named scripts (actions and services). An action script is
-//    something that exits, while a service does not. For example, starting a
-//    server is considered a service, since it continues to run in the
-//    background. Each script has a name that can be referenced by other
-//    parts of the config.
+// something that exits, while a service does not. For example, starting a
+// server is considered a service, since it continues to run in the
+// background. Each script has a name that can be referenced by other
+// parts of the config.
 //
 // 2. A list of scripts to run on startup of gowatch.
 //
 // 3. A list of file triggers. The combined list of file triggers indicate
-//    which directories gowatch should watch for file changes.
+// which directories gowatch should watch for file changes.
 //
 // A file trigger holds the following:
 //
