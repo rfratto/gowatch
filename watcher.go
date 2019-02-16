@@ -84,123 +84,121 @@ func (w *Watcher) parseTriggerName(orig string) (trigger string, action string) 
 	return
 }
 
-// Validate validates the configuration file and returns any errors.
-func (w *Watcher) Validate() error {
-	// Validates all referenced triggers exist as either services or actions
-	validateTriggerNames := func() error {
-		// Get a list of all triggers
-		allTriggers := w.Config.StartupSteps
-		for _, ft := range w.Config.FileTriggers {
-			allTriggers = append(allTriggers, ft.Triggers...)
-		}
-
-		invalidTriggers := []string{}
-
-		// For each unique trigger, make sure there's an action or
-		// a service that matches it
-	outer:
-		for _, trigger := range uniqueStringSlice(allTriggers) {
-			trigger, _ = w.parseTriggerName(trigger)
-
-			for action := range w.Config.Actions {
-				if action == trigger {
-					continue outer
-				}
-			}
-
-			for service := range w.Config.Services {
-				if service == trigger {
-					continue outer
-				}
-			}
-
-			invalidTriggers = append(invalidTriggers, trigger)
-		}
-
-		if len(invalidTriggers) == 1 {
-			return fmt.Errorf(
-				"the referenced trigger %s does not exist",
-				invalidTriggers[0],
-			)
-		} else if len(invalidTriggers) > 1 {
-			return fmt.Errorf(
-				"the following referenced triggers do not exist: %s",
-				strings.Join(invalidTriggers, ", "),
-			)
-		}
-
-		return nil
+func (w *Watcher) validateTriggerNames() error {
+	// Get a list of all triggers
+	allTriggers := w.Config.StartupSteps
+	for _, ft := range w.Config.FileTriggers {
+		allTriggers = append(allTriggers, ft.Triggers...)
 	}
 
-	// Validates that no action or service can used a reserved character
-	validateActionName := func() error {
-		invalid := []string{}
+	invalidTriggers := []string{}
+
+	// For each unique trigger, make sure there's an action or
+	// a service that matches it
+outer:
+	for _, trigger := range uniqueStringSlice(allTriggers) {
+		trigger, _ = w.parseTriggerName(trigger)
 
 		for action := range w.Config.Actions {
-			if strings.ContainsRune(action, ':') {
-				invalid = append(invalid, action)
+			if action == trigger {
+				continue outer
 			}
 		}
 
 		for service := range w.Config.Services {
-			if strings.ContainsRune(service, ':') {
-				invalid = append(invalid, service)
+			if service == trigger {
+				continue outer
 			}
 		}
 
-		invalid = uniqueStringSlice(invalid)
-
-		if len(invalid) == 1 {
-			return fmt.Errorf(
-				"%s name invalid; cannot use ':'",
-				invalid[0],
-			)
-		} else if len(invalid) > 1 {
-			return fmt.Errorf(
-				"the following names are invalid because they have a ':' in the name: %s",
-				strings.Join(invalid, ", "),
-			)
-		}
-
-		return nil
+		invalidTriggers = append(invalidTriggers, trigger)
 	}
 
-	// Validates that all services and actions are unique
-	validateServiceUniqueness := func() error {
-		invalidServices := []string{}
+	if len(invalidTriggers) == 1 {
+		return fmt.Errorf(
+			"the referenced trigger %s does not exist",
+			invalidTriggers[0],
+		)
+	} else if len(invalidTriggers) > 1 {
+		return fmt.Errorf(
+			"the following referenced triggers do not exist: %s",
+			strings.Join(invalidTriggers, ", "),
+		)
+	}
 
-	outer:
-		for service := range w.Config.Services {
-			for action := range w.Config.Actions {
-				if service == action {
-					invalidServices = append(invalidServices, service)
-					continue outer
-				}
+	return nil
+}
+
+func (w Watcher) validateActionNames() error {
+	invalid := []string{}
+
+	for action := range w.Config.Actions {
+		if strings.ContainsRune(action, ':') {
+			invalid = append(invalid, action)
+		}
+	}
+
+	for service := range w.Config.Services {
+		if strings.ContainsRune(service, ':') {
+			invalid = append(invalid, service)
+		}
+	}
+
+	invalid = uniqueStringSlice(invalid)
+
+	if len(invalid) == 1 {
+		return fmt.Errorf(
+			"%s name invalid; cannot use ':'",
+			invalid[0],
+		)
+	} else if len(invalid) > 1 {
+		return fmt.Errorf(
+			"the following names are invalid because they have a ':' in the name: %s",
+			strings.Join(invalid, ", "),
+		)
+	}
+
+	return nil
+}
+
+func (w *Watcher) validateServiceUniqueness() error {
+	invalidServices := []string{}
+
+outer:
+	for service := range w.Config.Services {
+		for action := range w.Config.Actions {
+			if service == action {
+				invalidServices = append(invalidServices, service)
+				continue outer
 			}
 		}
-
-		invalidServices = uniqueStringSliceOrdered(invalidServices)
-
-		if len(invalidServices) == 1 {
-			return fmt.Errorf(
-				"%s is defined as both an action and a service",
-				invalidServices[0],
-			)
-		} else if len(invalidServices) > 1 {
-			return fmt.Errorf(
-				"the following are defined as both actions and services: %s",
-				strings.Join(invalidServices, ", "),
-			)
-		}
-
-		return nil
 	}
 
+	invalidServices = uniqueStringSliceOrdered(invalidServices)
+
+	if len(invalidServices) == 1 {
+		return fmt.Errorf(
+			"%s is defined as both an action and a service",
+			invalidServices[0],
+		)
+	} else if len(invalidServices) > 1 {
+		return fmt.Errorf(
+			"the following are defined as both actions and services: %s",
+			strings.Join(invalidServices, ", "),
+		)
+	}
+
+	return nil
+}
+
+// Validate validates the configuration file and returns any errors.
+func (w *Watcher) Validate() error {
 	type validateFunc func() error
+
 	validations := []validateFunc{
-		validateTriggerNames,
-		validateServiceUniqueness,
-		validateActionName,
+		w.validateTriggerNames,
+		w.validateServiceUniqueness,
+		w.validateActionNames,
 	}
 
 	for _, validation := range validations {
@@ -212,7 +210,49 @@ func (w *Watcher) Validate() error {
 	return nil
 }
 
-// Start starts the watcher. Start should not exit normally unless an error occured or
+func (w *Watcher) watchLoop(n *fsnotify.Watcher) error {
+	eventsBuffer := []string{}
+
+	var (
+		handlerContext context.Context
+		handlerCancel  context.CancelFunc
+		flushTimer     <-chan time.Time
+	)
+
+	for {
+		select {
+		case ev := <-n.Events:
+			if ev.Op == fsnotify.Chmod {
+				break
+			}
+
+			eventsBuffer = append(eventsBuffer, ev.Name)
+
+			if flushTimer == nil {
+				flushTimer = time.After(250 * time.Millisecond)
+			}
+		case err := <-n.Errors:
+			fmt.Println(err)
+		case <-flushTimer:
+			if handlerCancel != nil {
+				handlerCancel()
+			}
+
+			handlerContext, handlerCancel = context.WithCancel(context.Background())
+
+			go w.handleFilesChanged(handlerContext, eventsBuffer)
+			eventsBuffer = []string{}
+			flushTimer = nil
+		case <-w.ctx.Done():
+			if handlerCancel != nil {
+				handlerCancel()
+			}
+			return w.ctx.Err()
+		}
+	}
+}
+
+// Start starts the watcher. Start should not exit normally unless an error ocurred or
 // the watcher is cancelled through the context passed to NewWatchWithContext.
 func (w *Watcher) Start() error {
 	if err := w.Validate(); err != nil {
@@ -249,45 +289,7 @@ func (w *Watcher) Start() error {
 		}
 	}
 
-	eventsBuffer := []string{}
-
-	var (
-		handlerContext context.Context
-		handlerCancel  context.CancelFunc
-		flushTimer     <-chan time.Time
-	)
-
-	handlerContext, handlerCancel = context.WithCancel(context.Background())
-	defer func() {
-		handlerCancel()
-	}()
-
-	for {
-		select {
-		case ev := <-n.Events:
-			if ev.Op == fsnotify.Chmod {
-				break
-			}
-
-			eventsBuffer = append(eventsBuffer, ev.Name)
-
-			if flushTimer == nil {
-				flushTimer = time.After(250 * time.Millisecond)
-			}
-		case err := <-n.Errors:
-			fmt.Println(err)
-		case <-flushTimer:
-			handlerCancel()
-			handlerContext, handlerCancel = context.WithCancel(context.Background())
-
-			go w.handleFilesChanged(handlerContext, eventsBuffer)
-			eventsBuffer = []string{}
-			flushTimer = nil
-		case <-w.ctx.Done():
-			handlerCancel()
-			return w.ctx.Err()
-		}
-	}
+	return w.watchLoop(n)
 }
 
 func (w *Watcher) stopService(ctx context.Context, trigger string) error {

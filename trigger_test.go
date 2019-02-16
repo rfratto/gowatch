@@ -31,7 +31,7 @@ func getFtWatcher(inc []string, exc []string) gowatch.Watcher {
 		Directory: projectd(wd),
 		Config: gowatch.Config{
 			FileTriggers: []gowatch.FileTrigger{
-				gowatch.FileTrigger{
+				{
 					Include:  inc,
 					Exclude:  exc,
 					Triggers: []string{"foo", "bar"},
@@ -196,7 +196,7 @@ func TestWatchedPaths(t *testing.T) {
 
 		// although we have to includes here, we watch per-folder so we should roll
 		// this up into one.
-		{"simplifiy", []string{".", "package.json"}, []string{wd}},
+		{"simplify", []string{".", "package.json"}, []string{wd}},
 
 		{"single dir", []string{"src"}, []string{path.Join(wd, "src")}},
 		{"single dir trailing slash", []string{"src/"}, []string{path.Join(wd, "src")}},
