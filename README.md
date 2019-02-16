@@ -1,5 +1,6 @@
 # gowatch
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/rfratto/gowatch)](https://goreportcard.com/report/github.com/rfratto/gowatch)
 [![GoDoc](https://godoc.org/github.com/rfratto/gowatch?status.svg)](https://godoc.org/github.com/rfratto/gowatch)
 
 gowatch is both a tool and a library to run both scripts and long-running
