@@ -252,7 +252,7 @@ func (w *Watcher) watchLoop(n *fsnotify.Watcher) error {
 	}
 }
 
-// Start starts the watcher. Start should not exit normally unless an error ocurred or
+// Start starts the watcher. Start should not exit normally unless an error occurred or
 // the watcher is cancelled through the context passed to NewWatchWithContext.
 func (w *Watcher) Start() error {
 	if err := w.Validate(); err != nil {
