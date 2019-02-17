@@ -457,6 +457,8 @@ outer:
 				// Stop the other triggers from running if a command
 				// fails.
 				break outer
+			} else if err == context.Canceled {
+				fmt.Fprintf(w.Stderr, "[%s] CANCELLED\n", trigger)
 			}
 		}
 	}
