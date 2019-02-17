@@ -2,22 +2,6 @@
 
 
 [[projects]]
-  digest = "1:e92f5581902c345eb4ceffdcd4a854fb8f73cf436d47d837d1ec98ef1fe0a214"
-  name = "github.com/StackExchange/wmi"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "5d049714c4a64225c3c79a7cf7d02f7fb5b96338"
-  version = "1.0.0"
-
-[[projects]]
-  branch = "master"
-  digest = "1:08a1c838fb5341d94ba86683f2f5c71870e9513870e690012ad4f26f58adb7e4"
-  name = "github.com/alexbrainman/ps"
-  packages = ["winapi"]
-  pruneopts = "UT"
-  revision = "b3e1b4a158941f30770a77f462c8b6cae974a40c"
-
-[[projects]]
   digest = "1:2aaf2cc045d0219bba79655e4df795b973168c310574669cb75786684f7287d3"
   name = "github.com/bmatcuk/doublestar"
   packages = ["."]
@@ -26,55 +10,12 @@
   version = "v1.1.1"
 
 [[projects]]
-  branch = "master"
-  digest = "1:6805e938354a6121f1bf2d11fb69fc477a5aae815583807aae7095a32e83a0ff"
-  name = "github.com/contester/runlib"
-  packages = [
-    "contester_proto",
-    "tools",
-    "win32",
-  ]
-  pruneopts = "UT"
-  revision = "9ace25f3155a7b44cb0301e6891a7969b4a30dfa"
-
-[[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
   name = "github.com/fsnotify/fsnotify"
   packages = ["."]
   pruneopts = "UT"
   revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
   version = "v1.4.7"
-
-[[projects]]
-  digest = "1:c96d16a4451e48e2c44b2c3531fd8ec9248d822637f1911a88959ca0bcae4a64"
-  name = "github.com/go-ole/go-ole"
-  packages = [
-    ".",
-    "oleutil",
-  ]
-  pruneopts = "UT"
-  revision = "39dc8486bd0952279431257138bc428275b86797"
-  version = "v1.2.2"
-
-[[projects]]
-  digest = "1:a9c85389dbd301c97a3499fe15a2b65b505b5f0cb0f1120dea59f1f3d6b11d96"
-  name = "github.com/gogo/protobuf"
-  packages = [
-    "gogoproto",
-    "proto",
-    "protoc-gen-gogo/descriptor",
-  ]
-  pruneopts = "UT"
-  revision = "4cbf7e384e768b4e01799441fdf2a706a5635ae7"
-  version = "v1.2.0"
-
-[[projects]]
-  digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
-  name = "github.com/golang/protobuf"
-  packages = ["proto"]
-  pruneopts = "UT"
-  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
-  version = "v1.2.0"
 
 [[projects]]
   digest = "1:870d441fe217b8e689d7949fef6e43efbc787e50f200cb1e70dbca9204a1d6be"
@@ -86,34 +27,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:7d1a655e1f16ccaf1adb026bdeece28499ecb0ead32d32accc6ed6f2c40cacee"
-  name = "github.com/juju/errors"
+  digest = "1:5d44a63f2dec93a86ec253e37d9a2134591b4ec8fb2e71fa56015d6b06746395"
+  name = "github.com/jsgilmore/mount"
   packages = ["."]
   pruneopts = "UT"
-  revision = "089d3ea4e4d597bd98acac068193d341983326a3"
-
-[[projects]]
-  digest = "1:014d86c6b3f1811b99a705133b4f9e9d9c1270fed55497f0387362c728c414b3"
-  name = "github.com/shirou/gopsutil"
-  packages = [
-    "cpu",
-    "host",
-    "internal/common",
-    "mem",
-    "net",
-    "process",
-  ]
-  pruneopts = "UT"
-  revision = "ccc1c1016bc5d10e803189ee43417c50cdde7f1b"
-  version = "v2.18.12"
-
-[[projects]]
-  branch = "master"
-  digest = "1:99c6a6dab47067c9b898e8c8b13d130c6ab4ffbcc4b7cc6236c2cd0b1e344f5b"
-  name = "github.com/shirou/w32"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "bb4de0191aa41b5507caa14b0650cdbddcd9280b"
+  revision = "fb33415ae3d4ca99f8eaf47651786c5805658ab7"
 
 [[projects]]
   digest = "1:645cabccbb4fa8aab25a956cbcbdf6a6845ca736b2c64e197ca7cbb9d210b939"
@@ -182,11 +100,9 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/alexbrainman/ps/winapi",
     "github.com/bmatcuk/doublestar",
-    "github.com/contester/runlib/win32",
     "github.com/fsnotify/fsnotify",
-    "github.com/shirou/gopsutil/process",
+    "github.com/jsgilmore/mount",
     "github.com/spf13/cobra",
     "gopkg.in/yaml.v2",
     "mvdan.cc/sh/interp",

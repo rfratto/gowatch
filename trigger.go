@@ -95,7 +95,8 @@ func getDirs(paths []string) []string {
 			dirs = append(dirs, filepath.Dir(path))
 		}
 	}
-	return dirs
+
+	return fixDirectories(dirs)
 }
 
 func isDir(path string) bool {
