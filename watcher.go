@@ -234,6 +234,12 @@ func (w *Watcher) watchLoop(n *fsnotify.Watcher) error {
 		case err := <-n.Errors:
 			fmt.Println(err)
 		case <-flushTimer:
+			if len(w.triggersForFiles(eventsBuffer)) == 0 {
+				eventsBuffer = []string{}
+				flushTimer = nil
+				continue
+			}
+
 			if handlerCancel != nil {
 				handlerCancel()
 			}
@@ -423,7 +429,7 @@ func NewWatcher(dir string, config Config) *Watcher {
 	return NewWatcherWithContext(context.Background(), dir, config)
 }
 
-func (w *Watcher) handleFilesChanged(ctx context.Context, files []string) {
+func (w *Watcher) triggersForFiles(files []string) []string {
 	// Get the list of triggers from all the files that changed
 	shouldTrigger := []string{}
 	for _, file := range files {
@@ -439,7 +445,11 @@ func (w *Watcher) handleFilesChanged(ctx context.Context, files []string) {
 		}
 	}
 
-	triggerList := uniqueStringSliceOrdered(shouldTrigger)
+	return uniqueStringSliceOrdered(shouldTrigger)
+}
+
+func (w *Watcher) handleFilesChanged(ctx context.Context, files []string) {
+	triggerList := w.triggersForFiles(files)
 
 outer:
 	for _, trigger := range triggerList {
