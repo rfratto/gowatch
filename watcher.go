@@ -210,6 +210,49 @@ func (w *Watcher) Validate() error {
 	return nil
 }
 
+func (w *Watcher) watchForNewPatterns(init []string, n *fsnotify.Watcher) {
+	watchedMap := make(map[string]bool)
+	for _, p := range init {
+		watchedMap[p] = true
+	}
+
+	reloadPatterns := func() {
+		latest := w.WatchedPaths()
+		addedPaths := []string{}
+		for _, p := range latest {
+			_, exists := watchedMap[p]
+			if !exists {
+				addedPaths = append(addedPaths, p)
+			}
+
+			watchedMap[p] = true
+		}
+
+		if len(addedPaths) > 0 {
+			watched := uniqueStringSlice(getDirs(addedPaths))
+			for _, p := range watched {
+				if err := n.Add(p); err != nil {
+					fmt.Fprintf(w.Debug, "failed to add new path %s: %v\n", p, err)
+				} else {
+					fmt.Fprintf(w.Debug, "watching new path %s\n", p)
+				}
+			}
+		}
+	}
+
+	// New files may be added at any point while gowatch continues to run.
+	// Every 1s we'll see if there are any new files that've been added so we
+	// can tell the watcher to include them.
+	for {
+		select {
+		case <-time.After(1 * time.Second):
+			reloadPatterns()
+		case <-w.ctx.Done():
+			return
+		}
+	}
+}
+
 func (w *Watcher) watchLoop(n *fsnotify.Watcher) error {
 	eventsBuffer := []string{}
 
@@ -284,7 +327,8 @@ func (w *Watcher) Start() error {
 		return fmt.Errorf("unable to start watcher: %v", err)
 	}
 
-	watched := uniqueStringSlice(getDirs(w.WatchedPaths()))
+	paths := w.WatchedPaths()
+	watched := uniqueStringSlice(getDirs(paths))
 	if len(watched) == 0 {
 		return fmt.Errorf("no paths to watch")
 	}
@@ -295,6 +339,7 @@ func (w *Watcher) Start() error {
 		}
 	}
 
+	go w.watchForNewPatterns(paths, n)
 	return w.watchLoop(n)
 }
 
